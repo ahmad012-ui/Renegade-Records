@@ -4,7 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0B0B0D">
-  <meta name="description" content="Renegade Records — independent record label and music production studio. Music production, recording, mixing, mastering and artist development.">
+  <meta name="description" content="Renegade Records is an independent record label and music production studio offering custom music production, recording, mixing, mastering and artist development.">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Renegade Records | Music Production & Recording Studio">
+  <meta property="og:description" content="We don't follow the sound. We create it. Discover Renegade Records and Renegade Music Productions.">
+  <meta property="og:image" content="https://renegadenoir.vercel.app/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Renegade Records | Music Production & Recording Studio">
+  <meta name="twitter:description" content="Custom music production, recording, mixing, mastering and artist development.">
   <title>Renegade Records | Music Production & Recording Studio</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -138,17 +146,18 @@
                   <a class="book-link" href="https://www.instagram.com/renegadestudioo/" target="_blank" rel="noreferrer">MESSAGE THE STUDIO <span>↗</span></a>
                 </div>
                 <form class="inquiry-form" id="inquiry-form">
-                  <label>YOUR NAME<input name="name" placeholder="Name / Artist name" required></label>
-                  <label>EMAIL ADDRESS<input type="email" name="email" placeholder="you@example.com" required></label>
+                  <p class="form-note">Your details are prepared in WhatsApp. Nothing is stored on this website.</p>
+                  <label>YOUR NAME<input name="name" autocomplete="name" maxlength="100" placeholder="Name / Artist name" required></label>
+                  <label>EMAIL ADDRESS<input type="email" name="email" autocomplete="email" maxlength="254" placeholder="you@example.com" required></label>
                   <label>WHAT DO YOU NEED?
                     <select name="service" required>
                       <option value="">Select a service</option>
                       <option>Music production</option><option>Beat production</option><option>Recording session</option><option>Mixing & mastering</option><option>Artist development</option><option>Commercial music</option>
                     </select>
                   </label>
-                  <label>PROJECT NOTES<textarea name="message" rows="3" placeholder="Tell us a little about the sound in your head..."></textarea></label>
+                  <label>PROJECT NOTES<textarea name="message" rows="3" maxlength="2000" placeholder="Tell us a little about the sound in your head..."></textarea></label>
                   <button class="button button-primary submit-button" type="submit">SEND AN INQUIRY <span>↗</span></button>
-                  <p class="form-note" id="form-note">DESIGN PREVIEW — FORM DELIVERY & WHATSAPP DETAILS TO BE CONNECTED.</p>
+                  <p class="form-note" id="form-note">WHATSAPP WILL OPEN WITH YOUR INQUIRY READY TO SEND.</p>
                 </form>
               </div>
               <div class="booking-bottom"><span>RENEGADE RECORDS / MUSIC PRODUCTIONS</span><span>AVAILABLE FOR SELECT PROJECTS</span></div>
