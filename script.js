@@ -1,28 +1,3 @@
-const frame = document.getElementById("device-frame");
-const viewport = document.getElementById("site-viewport");
-const deviceButtons = Array.from(document.querySelectorAll("[data-device]"));
-const frameTopline = document.querySelector(".frame-topline");
-const viewportLabel = document.getElementById("viewport-label");
-const frameSize = document.getElementById("frame-size");
-
-deviceButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    const isMobile = button.dataset.device === "mobile";
-
-    deviceButtons.forEach((item) => {
-      const active = item === button;
-      item.classList.toggle("is-active", active);
-      item.setAttribute("aria-pressed", String(active));
-    });
-
-    frame.classList.toggle("is-mobile", isMobile);
-    frameTopline.classList.toggle("mobile-mode", isMobile);
-    viewportLabel.textContent = isMobile ? "MOBILE VIEW · 390 PX" : "DESKTOP VIEW · FLUID WIDTH";
-    frameSize.textContent = isMobile ? "390 × 820 / MOBILE" : "1440 × RESPONSIVE";
-    viewport.scrollTop = 0;
-  });
-});
-
 const mobileToggle = document.querySelector(".mobile-nav-toggle");
 const navigation = document.getElementById("main-nav");
 
