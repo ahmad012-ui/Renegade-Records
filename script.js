@@ -23,7 +23,25 @@ const formNote = document.getElementById("form-note");
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
-  formNote.textContent = "PREVIEW ONLY — NO MESSAGE WAS SENT. CONNECT THE APPROVED EMAIL OR WHATSAPP DESTINATION BEFORE LAUNCH.";
+  if (!form.reportValidity()) return;
+
+  const data = new FormData(form);
+  const name = String(data.get("name") || "").trim();
+  const email = String(data.get("email") || "").trim();
+  const service = String(data.get("service") || "").trim();
+  const message = String(data.get("message") || "").trim();
+  const inquiry = [
+    "Hello Renegade Records, I'd like to make an inquiry.",
+    "",
+    "Name: " + name,
+    "Email: " + email,
+    "Service: " + service,
+    message ? "Project notes: " + message : ""
+  ].filter(Boolean).join("\n");
+
+  const whatsappUrl = "https://wa.me/923251052557?text=" + encodeURIComponent(inquiry);
+  window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+  formNote.textContent = "WhatsApp has opened with your inquiry. Review the message and press Send to contact Renegade Records.";
   formNote.classList.add("is-success");
 });
 
