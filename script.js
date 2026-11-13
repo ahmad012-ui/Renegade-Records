@@ -40,8 +40,13 @@ form.addEventListener("submit", (event) => {
   ].filter(Boolean).join("\n");
 
   const whatsappUrl = "https://wa.me/923251052557?text=" + encodeURIComponent(inquiry);
-  window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-  formNote.textContent = "WhatsApp has opened with your inquiry. Review the message and press Send to contact Renegade Records.";
+  const whatsappWindow = window.open(whatsappUrl, "_blank");
+  if (whatsappWindow) {
+    whatsappWindow.opener = null;
+  } else {
+    window.location.assign(whatsappUrl);
+  }
+  formNote.textContent = "WhatsApp is opening with your inquiry. Review the message and press Send to contact Renegade Records.";
   formNote.classList.add("is-success");
 });
 
