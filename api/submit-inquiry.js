@@ -33,7 +33,7 @@ async function sendWhatsAppNotification(inquiry) {
       body: JSON.stringify({
         messaging_product: "whatsapp",
         recipient_type: "individual",
-        to: process.env.WHATSAPP_TO.replace(/\\D/g, ""),
+        to: process.env.WHATSAPP_TO.replace(/\D/g, ""),
         type: "template",
         template: {
           name: process.env.WHATSAPP_TEMPLATE_NAME,
@@ -95,7 +95,7 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(inquiry.email)) {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inquiry.email)) {
     return json(res, 400, { success: false, message: "Please enter a valid email address." });
   }
 
@@ -151,7 +151,7 @@ module.exports = async function handler(req, res) {
           "",
           "Project notes:",
           inquiry.message
-        ].join("\\n")
+        ].join("\n")
       });
       if (result.error) throw new Error(result.error.message || "Resend failed.");
       return result;
