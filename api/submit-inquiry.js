@@ -47,7 +47,7 @@ async function sendWhatsAppNotification(inquiry) {
               { type: "text", text: inquiry.email },
               { type: "text", text: inquiry.phone || "Not provided" },
               { type: "text", text: inquiry.service },
-              { type: "text", text: inquiry.message || "No project notes provided" }
+              { type: "text", text: (inquiry.message || "No project notes provided").slice(0, 1024) }
             ]
           }]
         }
@@ -187,8 +187,6 @@ module.exports = async function handler(req, res) {
     emailed,
     whatsappSent,
     inquiryId: sheetResult.value.inquiryId,
-    message: emailed
-      ? "Your inquiry has been received. Renegade Records will be in touch."
-      : "Your inquiry was saved, but the email notification could not be sent. Please try again later if you don't hear back."
+    message: "Your inquiry has been received. Renegade Records will be in touch."
   });
 };
