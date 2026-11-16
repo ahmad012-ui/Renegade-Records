@@ -1,6 +1,7 @@
 const { Resend } = require("resend");
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+const WHATSAPP_API_VERSION = process.env.WHATSAPP_API_VERSION || "v27.0";
 
 function json(res, status, body) {
   res.status(status).setHeader("Content-Type", "application/json");
@@ -9,6 +10,56 @@ function json(res, status, body) {
 
 function clean(value, maxLength) {
   return String(value || "").trim().slice(0, maxLength);
+}
+
+function isWhatsAppConfigured() {
+  return Boolean(
+    process.env.WHATSAPP_ACCESS_TOKEN &&
+    process.env.WHATSAPP_PHONE_NUMBER_ID &&
+    process.env.WHATSAPP_TO &&
+    process.env.WHATSAPP_TEMPLATE_NAME
+  );
+}
+
+async function sendWhatsAppNotification(inquiry) {
+  const response = await fetch(
+    `https://graph.facebook.com/${WHATSAPP_API_VERSION}/${process.env.WHATSAPP_PHONE_NUMBER_ID}/messages`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.WHATSAPP_ACCESS_TOKEN}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        to: process.env.WHATSAPP_TO.replace(/\\D/g, ""),
+        type: "template",
+        template: {
+          name: process.env.WHATSAPP_TEMPLATE_NAME,
+          language: {
+            code: process.env.WHATSAPP_TEMPLATE_LANGUAGE || "en_US"
+          },
+          components: [{
+            type: "body",
+            parameters: [
+              { type: "text", text: inquiry.name },
+              { type: "text", text: inquiry.email },
+              { type: "text", text: inquiry.phone || "Not provided" },
+              { type: "text", text: inquiry.service },
+              { type: "text", text: inquiry.message || "No project notes provided" }
+            ]
+          }]
+        }
+      })
+    }
+  );
+
+  const result = await response.json();
+  if (!response.ok || result.error) {
+    throw new Error(result.error?.message || "WhatsApp notification failed.");
+  }
+  return result;
 }
 
 module.exports = async function handler(req, res) {
@@ -26,23 +77,25 @@ module.exports = async function handler(req, res) {
     website: honeypot
   } = req.body || {};
 
-  // Quietly reject automated submissions caught by the hidden honeypot.
-  if (honeypot) return json(res, 200, { success: true });
+  // Quietly accept automated submissions caught by the hidden honeypot.
+  if (honeypot) return json(res, 200, { success: true, saved: true });
 
-  const name = clean(rawName, 100);
-  const email = clean(rawEmail, 254);
-  const phone = clean(rawPhone, 40);
-  const service = clean(rawService, 120);
-  const message = clean(rawMessage, 2000);
+  const inquiry = {
+    name: clean(rawName, 100),
+    email: clean(rawEmail, 254),
+    phone: clean(rawPhone, 40),
+    service: clean(rawService, 120),
+    message: clean(rawMessage, 2000)
+  };
 
-  if (!name || !email || !service || !message) {
+  if (!inquiry.name || !inquiry.email || !inquiry.service || !inquiry.message) {
     return json(res, 400, {
       success: false,
       message: "Please complete your name, email, service and project notes."
     });
   }
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(inquiry.email)) {
     return json(res, 400, { success: false, message: "Please enter a valid email address." });
   }
 
@@ -62,11 +115,11 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  const inquiry = { name, email, phone, service, message };
+  const whatsappConfigured = isWhatsAppConfigured();
 
-  // Save to Sheets and send email independently: an email outage must not
-  // prevent the inquiry from being recorded.
-  const [sheetResult, emailResult] = await Promise.allSettled([
+  // Each destination is independent. A temporary WhatsApp outage must not
+  // prevent a visitor's inquiry from being saved to Sheets or emailed.
+  const [sheetResult, emailResult, whatsappResult] = await Promise.allSettled([
     (async () => {
       const response = await fetch(process.env.GOOGLE_APPS_SCRIPT_URL, {
         method: "POST",
@@ -86,36 +139,44 @@ module.exports = async function handler(req, res) {
       const result = await resend.emails.send({
         from: process.env.EMAIL_FROM,
         to: [process.env.EMAIL_TO],
-        replyTo: email,
-        subject: `New Renegade Records inquiry — ${service}`,
+        replyTo: inquiry.email,
+        subject: `New Renegade Records inquiry — ${inquiry.service}`,
         text: [
           "A new inquiry was submitted through the Renegade Records website.",
           "",
-          `Name: ${name}`,
-          `Email: ${email}`,
-          `Phone: ${phone || "Not provided"}`,
-          `Service: ${service}`,
+          `Name: ${inquiry.name}`,
+          `Email: ${inquiry.email}`,
+          `Phone: ${inquiry.phone || "Not provided"}`,
+          `Service: ${inquiry.service}`,
           "",
           "Project notes:",
-          message
-        ].join("\n")
+          inquiry.message
+        ].join("\\n")
       });
       if (result.error) throw new Error(result.error.message || "Resend failed.");
       return result;
-    })()
+    })(),
+    whatsappConfigured
+      ? sendWhatsAppNotification(inquiry)
+      : Promise.resolve({ skipped: true, reason: "WhatsApp credentials are not configured yet." })
   ]);
 
   const saved = sheetResult.status === "fulfilled";
   const emailed = emailResult.status === "fulfilled";
+  const whatsappSent = whatsappConfigured && whatsappResult.status === "fulfilled";
 
   if (!saved) console.error("Google Sheets save failed:", sheetResult.reason);
   if (!emailed) console.error("Resend email failed:", emailResult.reason);
+  if (whatsappConfigured && !whatsappSent) {
+    console.error("WhatsApp notification failed:", whatsappResult.reason);
+  }
 
   if (!saved) {
     return json(res, 502, {
       success: false,
       saved: false,
       emailed,
+      whatsappSent,
       message: "We couldn't save your inquiry. Please try again or contact the studio directly."
     });
   }
@@ -124,6 +185,7 @@ module.exports = async function handler(req, res) {
     success: true,
     saved: true,
     emailed,
+    whatsappSent,
     inquiryId: sheetResult.value.inquiryId,
     message: emailed
       ? "Your inquiry has been received. Renegade Records will be in touch."
