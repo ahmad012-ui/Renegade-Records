@@ -237,3 +237,8 @@ button{color:inherit}
 .inquiry-form .form-honeypot{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}
 .inquiry-form .submit-button:disabled{opacity:.6;cursor:wait}
 .form-note.is-error{color:#e18b91}
+
+/* Direct WhatsApp contact link */
+.form-whatsapp-link{font:8px/1.8 var(--display);letter-spacing:.08em;color:var(--steel);margin:0}
+.form-whatsapp-link a{color:var(--ivory);border-bottom:1px solid var(--crimson);padding-bottom:2px;margin-left:5px}
+.form-whatsapp-link a:hover{color:#fff}
