@@ -2,7 +2,7 @@
 
 ## Visitor experience
 
-The contact form stays on the website. Submitting it sends the inquiry to the server; it does not open WhatsApp or an email app. The server saves the inquiry to Google Sheets and sends an email. Once Meta credentials and an approved template are configured, it also sends a WhatsApp notification in the background.
+The contact form stays on the website. Submitting it sends the inquiry to the server; it does not open WhatsApp or an email app. The server saves the inquiry to Google Sheets and submits it to Formspree, which sends the notification email to the recipient configured in the Formspree dashboard. Once Meta credentials and an approved template are configured, it also sends a WhatsApp notification in the background.
 
 The contact section and footer include a separate WhatsApp link for visitors who prefer to start a conversation themselves.
 
@@ -13,11 +13,12 @@ Add these as server-side environment variables in the Vercel project. Do not pre
 Required:
 - `GOOGLE_APPS_SCRIPT_URL`: the deployed Apps Script Web App URL ending in `/exec`.
 - `GOOGLE_APPS_SCRIPT_SECRET`: the same private shared secret configured in Apps Script.
-- `RESEND_API_KEY`: Resend API key.
-- `EMAIL_FROM`: a sender address on a domain verified in Resend.
-- `EMAIL_TO`: `renegaderecordsusa@gmail.com`.
+- `FORMSPREE_ENDPOINT`: the dashboard form endpoint, in the format `https://formspree.io/f/your-form-id`. Configure the Formspree form's notification recipient as `renegaderecordsusa@gmail.com`.
 
-Optional WhatsApp Cloud API:
+The website is a plain HTML/JavaScript site, not a React app. Use a **Dashboard project** in Formspree and create a form there. A Formspree CLI project (Project ID + Deploy Key) is intended for the CLI/React workflow and is not the endpoint URL used by this website.
+
+## Optional WhatsApp Cloud API
+
 - `WHATSAPP_API_VERSION`: Graph API version, currently set to `v27.0`.
 - `WHATSAPP_ACCESS_TOKEN`: Meta access token with WhatsApp messaging permission.
 - `WHATSAPP_PHONE_NUMBER_ID`: the Cloud API sender's Phone Number ID (not the visible phone number).
@@ -54,10 +55,6 @@ The WhatsApp Cloud API sender must be a different number from the recipient. The
 
 Messages initiated by the business outside an active customer-service window require an approved template. The website notification uses a template for that reason.
 
-## Resend sender domain
-
-The Resend test sender `onboarding@resend.dev` is for testing and may only deliver to permitted/verified recipients. For production delivery to Renegade's Gmail inbox, verify a domain you control in Resend and set `EMAIL_FROM` to an address on that verified domain.
-
 ## Deployment
 
-The current work is on `feature/contact-form-automation`. It is not merged into production. After the correct Vercel-connected repository is confirmed, configure environment variables in its Vercel project and deploy a Preview before merging.
+The current work is on `feature/contact-form-automation`. It is not merged into production. Configure the two required Vercel Preview environment variables and deploy a Preview before merging.
