@@ -150,7 +150,7 @@ button{color:inherit}
 .type-sample b{font:700 13px var(--display);letter-spacing:-.04em}
 .type-sample span{font:10px var(--body);color:#aaa8ae}
 .board-footer{display:flex;justify-content:space-between;gap:12px;border-top:1px solid rgba(242,240,235,.14);padding:16px 0 22px;color:#6f6e74;font:8px var(--display);letter-spacing:.12em}
-.form-note.is-success{color:#d7b1b8}
+.form-note.is-success{color:#6fce91}
 .reveal{opacity:0;transform:translateY(18px);transition:opacity .65s ease,transform .65s ease}
 .reveal.is-visible{opacity:1;transform:none}
 
