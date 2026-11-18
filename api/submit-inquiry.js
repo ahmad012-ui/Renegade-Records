@@ -6,7 +6,7 @@ function json(res, status, body) {
 }
 
 function clean(value, maxLength) {
-  return String(value || "").trim().slice(0, maxLength);
+  return String(value || "").replace(/[\r\n\t]+/g, " ").replace(/ {4,}/g, " ").trim().slice(0, maxLength);
 }
 
 async function readJson(response, serviceName) {
@@ -44,6 +44,7 @@ async function sendWhatsAppNotification(inquiry) {
         Authorization: `Bearer ${process.env.WHATSAPP_ACCESS_TOKEN}`,
         "Content-Type": "application/json"
       },
+      signal: AbortSignal.timeout(8000),
       body: JSON.stringify({
         messaging_product: "whatsapp",
         recipient_type: "individual",
@@ -61,7 +62,7 @@ async function sendWhatsAppNotification(inquiry) {
               { type: "text", text: inquiry.email },
               { type: "text", text: inquiry.phone || "Not provided" },
               { type: "text", text: inquiry.service },
-              { type: "text", text: (inquiry.message || "No project notes provided").slice(0, 1024) }
+              { type: "text", text: clean(inquiry.message || "No project notes provided", 1024) }
             ]
           }]
         }
@@ -78,6 +79,7 @@ async function saveToGoogleSheets(inquiry) {
   const response = await fetch(process.env.GOOGLE_APPS_SCRIPT_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    signal: AbortSignal.timeout(8000),
     body: JSON.stringify({
       secret: process.env.GOOGLE_APPS_SCRIPT_SECRET,
       ...inquiry
@@ -109,6 +111,7 @@ async function sendFormspreeEmail(inquiry) {
       "Content-Type": "application/json",
       Accept: "application/json"
     },
+    signal: AbortSignal.timeout(8000),
     body: JSON.stringify({
       ...inquiry,
       _subject: `New Renegade Records inquiry — ${inquiry.service}`,
