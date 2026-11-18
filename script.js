@@ -27,6 +27,17 @@ if (mobileToggle && navigation) {
   });
 }
 
+document.querySelectorAll('a[target="_blank"]').forEach((link) => {
+  const label = (link.getAttribute("aria-label") || link.textContent || "External link").trim();
+  if (!label.toLowerCase().includes("opens in new tab")) {
+    link.setAttribute("aria-label", label + " (opens in new tab)");
+  }
+});
+
+document.querySelectorAll(".hero-photo, .work-image img, .studio-image img").forEach((image) => {
+  image.addEventListener("error", () => { image.hidden = true; }, { once: true });
+});
+
 const form = document.getElementById("inquiry-form");
 const formNote = document.getElementById("form-note");
 const submitButton = form?.querySelector('button[type="submit"]');
