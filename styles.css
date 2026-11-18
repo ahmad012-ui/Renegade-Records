@@ -281,3 +281,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
  .footer-links a,.footer-copy,.form-whatsapp-link{font-size:11px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+.hero{background:linear-gradient(90deg,#0b0b0d 0%,#17171b 58%,#25252a 100%)}
+.studio-image{background:linear-gradient(135deg,#25252a,#111114)}
+.work-image img[hidden],.hero-photo[hidden],.studio-image img[hidden]{display:none}
