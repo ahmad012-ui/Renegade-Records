@@ -1,6 +1,3 @@
-const { Resend } = require("resend");
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 const WHATSAPP_API_VERSION = process.env.WHATSAPP_API_VERSION || "v27.0";
 
 function json(res, status, body) {
@@ -10,6 +7,23 @@ function json(res, status, body) {
 
 function clean(value, maxLength) {
   return String(value || "").trim().slice(0, maxLength);
+}
+
+async function readJson(response, serviceName) {
+  const raw = await response.text();
+  let result;
+
+  try {
+    result = raw ? JSON.parse(raw) : {};
+  } catch {
+    throw new Error(`${serviceName} returned an unreadable response (HTTP ${response.status}).`);
+  }
+
+  if (!response.ok) {
+    throw new Error(result.error?.message || result.message || `${serviceName} request failed (HTTP ${response.status}).`);
+  }
+
+  return result;
 }
 
 function isWhatsAppConfigured() {
@@ -33,7 +47,7 @@ async function sendWhatsAppNotification(inquiry) {
       body: JSON.stringify({
         messaging_product: "whatsapp",
         recipient_type: "individual",
-        to: process.env.WHATSAPP_TO.replace(/\D/g, ""),
+        to: process.env.WHATSAPP_TO.replace(/\\D/g, ""),
         type: "template",
         template: {
           name: process.env.WHATSAPP_TEMPLATE_NAME,
@@ -55,9 +69,56 @@ async function sendWhatsAppNotification(inquiry) {
     }
   );
 
-  const result = await response.json();
-  if (!response.ok || result.error) {
-    throw new Error(result.error?.message || "WhatsApp notification failed.");
+  const result = await readJson(response, "WhatsApp");
+  if (result.error) throw new Error(result.error.message || "WhatsApp notification failed.");
+  return result;
+}
+
+async function saveToGoogleSheets(inquiry) {
+  const response = await fetch(process.env.GOOGLE_APPS_SCRIPT_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      secret: process.env.GOOGLE_APPS_SCRIPT_SECRET,
+      ...inquiry
+    })
+  });
+
+  const result = await readJson(response, "Google Sheets");
+  if (!result.success) {
+    throw new Error(result.message || "Google Sheets rejected the inquiry.");
+  }
+  return result;
+}
+
+async function sendFormspreeEmail(inquiry) {
+  const endpoint = process.env.FORMSPREE_ENDPOINT;
+  const parsedEndpoint = new URL(endpoint);
+
+  if (
+    parsedEndpoint.protocol !== "https:" ||
+    parsedEndpoint.hostname !== "formspree.io" ||
+    !parsedEndpoint.pathname.startsWith("/f/")
+  ) {
+    throw new Error("FORMSPREE_ENDPOINT must be a valid https://formspree.io/f/... form endpoint.");
+  }
+
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json"
+    },
+    body: JSON.stringify({
+      ...inquiry,
+      _subject: `New Renegade Records inquiry — ${inquiry.service}`,
+      _replyto: inquiry.email
+    })
+  });
+
+  const result = await readJson(response, "Formspree");
+  if (result.errors?.length) {
+    throw new Error(result.errors.map((item) => item.message).join("; "));
   }
   return result;
 }
@@ -95,16 +156,14 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inquiry.email)) {
+  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(inquiry.email)) {
     return json(res, 400, { success: false, message: "Please enter a valid email address." });
   }
 
   const requiredEnv = [
     "GOOGLE_APPS_SCRIPT_URL",
     "GOOGLE_APPS_SCRIPT_SECRET",
-    "RESEND_API_KEY",
-    "EMAIL_FROM",
-    "EMAIL_TO"
+    "FORMSPREE_ENDPOINT"
   ];
   const missing = requiredEnv.filter((key) => !process.env[key]);
   if (missing.length) {
@@ -117,45 +176,9 @@ module.exports = async function handler(req, res) {
 
   const whatsappConfigured = isWhatsAppConfigured();
 
-  // Each destination is independent. A temporary WhatsApp outage must not
-  // prevent a visitor's inquiry from being saved to Sheets or emailed.
   const [sheetResult, emailResult, whatsappResult] = await Promise.allSettled([
-    (async () => {
-      const response = await fetch(process.env.GOOGLE_APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          secret: process.env.GOOGLE_APPS_SCRIPT_SECRET,
-          ...inquiry
-        })
-      });
-      const result = await response.json();
-      if (!response.ok || !result.success) {
-        throw new Error(result.message || "Google Sheets rejected the inquiry.");
-      }
-      return result;
-    })(),
-    (async () => {
-      const result = await resend.emails.send({
-        from: process.env.EMAIL_FROM,
-        to: [process.env.EMAIL_TO],
-        replyTo: inquiry.email,
-        subject: `New Renegade Records inquiry — ${inquiry.service}`,
-        text: [
-          "A new inquiry was submitted through the Renegade Records website.",
-          "",
-          `Name: ${inquiry.name}`,
-          `Email: ${inquiry.email}`,
-          `Phone: ${inquiry.phone || "Not provided"}`,
-          `Service: ${inquiry.service}`,
-          "",
-          "Project notes:",
-          inquiry.message
-        ].join("\n")
-      });
-      if (result.error) throw new Error(result.error.message || "Resend failed.");
-      return result;
-    })(),
+    saveToGoogleSheets(inquiry),
+    sendFormspreeEmail(inquiry),
     whatsappConfigured
       ? sendWhatsAppNotification(inquiry)
       : Promise.resolve({ skipped: true, reason: "WhatsApp credentials are not configured yet." })
@@ -166,7 +189,7 @@ module.exports = async function handler(req, res) {
   const whatsappSent = whatsappConfigured && whatsappResult.status === "fulfilled";
 
   if (!saved) console.error("Google Sheets save failed:", sheetResult.reason);
-  if (!emailed) console.error("Resend email failed:", emailResult.reason);
+  if (!emailed) console.error("Formspree email failed:", emailResult.reason);
   if (whatsappConfigured && !whatsappSent) {
     console.error("WhatsApp notification failed:", whatsappResult.reason);
   }
@@ -187,6 +210,8 @@ module.exports = async function handler(req, res) {
     emailed,
     whatsappSent,
     inquiryId: sheetResult.value.inquiryId,
-    message: "Your inquiry has been received. Renegade Records will be in touch."
+    message: emailed
+      ? "Your inquiry has been received. Renegade Records will be in touch."
+      : "Your inquiry has been saved, but our email notification failed. For urgent requests, please contact us on WhatsApp."
   });
 };
