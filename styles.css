@@ -1,7 +1,7 @@
 :root {
   --obsidian:#0B0B0D;
   --charcoal:#202024;
-  --crimson:#C1122F;
+  --crimson:#A90F2B;
   --ivory:#F2F0EB;
   --steel:#85858B;
   --muted:#aaa9ad;
@@ -234,7 +234,7 @@ button{color:inherit}
 /* Inquiry form submission states */
 .inquiry-form .form-honeypot{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}
 .inquiry-form .submit-button:disabled{opacity:.6;cursor:wait}
-.form-note.is-error{color:#e18b91}
+.form-note.is-error{color:#A90F2B}
 
 /* Direct WhatsApp contact link */
 .form-whatsapp-link{font:8px/1.8 var(--display);letter-spacing:.08em;color:var(--steel);margin:0}
@@ -243,7 +243,7 @@ button{color:inherit}
 
 
 /* QA audit fixes: readable type, contrast, keyboard access and responsive zoom */
-:root{--crimson:#FF667A;--steel:#A5A4AB;--muted:#B9B8BE}
+:root{--crimson:#A90F2B;--steel:#A5A4AB;--muted:#B9B8BE}
 html{scroll-padding-top:88px}
 [id]{scroll-margin-top:88px}
 body{font-size:14px;line-height:1.6}
@@ -262,7 +262,7 @@ body{font-size:14px;line-height:1.6}
 .button-primary:hover,.header-book:hover{background:#870D24}
 .work-image{background:linear-gradient(135deg,#25252A,#111114)}
 .hero-photo{background:#18181c}
-a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #FF8796;outline-offset:4px}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #A90F2B;outline-offset:4px}
 .skip-link{position:fixed;top:10px;left:10px;z-index:1000;padding:12px 16px;background:var(--ivory);color:var(--obsidian);transform:translateY(-160%);font-size:14px}
 .skip-link:focus{transform:translateY(0)}
 .privacy-note{font:12px/1.6 var(--body);color:#C6C4CA;margin:2px 0}
