@@ -26,8 +26,7 @@ form.addEventListener("submit", async (event) => {
   event.preventDefault();
   if (!form.reportValidity()) return;
 
-  const data = new FormData(form);
-  const payload = Object.fromEntries(data.entries());
+  const payload = Object.fromEntries(new FormData(form).entries());
 
   submitButton.disabled = true;
   submitButton.setAttribute("aria-busy", "true");
@@ -37,17 +36,25 @@ form.addEventListener("submit", async (event) => {
   try {
     const response = await fetch("/api/submit-inquiry", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify(payload)
     });
-    const result = await response.json();
 
-    if (!response.ok || !result.success) {
-      throw new Error(result.message || "We couldn't send your inquiry. Please try again.");
+    const raw = await response.text();
+    let result;
+
+    try {
+      result = raw ? JSON.parse(raw) : {};
+    } catch {
+      throw new Error("The inquiry service returned an unexpected response. Please try again.");
     }
 
-    formNote.textContent = result.message;
-    formNote.classList.add("is-success");
+    if (!response.ok || !result.success) {
+      throw new Error(result.message || `We couldn't send your inquiry (HTTP ${response.status}). Please try again.`);
+    }
+
+    formNote.textContent = result.message || "Your inquiry has been received.";
+    formNote.classList.add(result.emailed === false ? "is-error" : "is-success");
     if (result.saved) form.reset();
   } catch (error) {
     formNote.textContent = error.message || "Something went wrong. Please try again or contact the studio directly.";
