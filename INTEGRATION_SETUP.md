@@ -55,6 +55,13 @@ The WhatsApp Cloud API sender must be a different number from the recipient. The
 
 Messages initiated by the business outside an active customer-service window require an approved template. The website notification uses a template for that reason.
 
+## Security and launch checklist
+
+- Keep all credentials in Vercel server-side environment variables; never commit them.
+- Configure persistent rate limiting (Upstash/Vercel KV) or Turnstile before public promotion. In-memory counters are not reliable across serverless instances.
+- Confirm the Formspree notification recipient and verify delivery.
+- Run a real test submission only with the owner's approval because it creates a live inquiry record and notification.
+
 ## Deployment
 
-The current work is on `feature/contact-form-automation`. It is not merged into production. Configure the two required Vercel Preview environment variables and deploy a Preview before merging.
+The QA remediation work is developed on a separate branch. Review and merge it only after the Preview deployment has been tested. Production and Preview must both contain `GOOGLE_APPS_SCRIPT_URL`, `GOOGLE_APPS_SCRIPT_SECRET` and `FORMSPREE_ENDPOINT`.

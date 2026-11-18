@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
-
 :root {
   --obsidian:#0B0B0D;
   --charcoal:#202024;
@@ -18,7 +16,7 @@ button,input,select,textarea{font:inherit}
 a{color:inherit;text-decoration:none}
 button{color:inherit}
 ::selection{background:var(--crimson);color:var(--ivory)}
-.site-viewport{width:100%;min-height:100vh;overflow:visible;container-type:inline-size;container-name:site;scroll-behavior:smooth}
+.site-viewport{width:100%;min-height:100dvh;overflow:visible;container-type:inline-size;container-name:site;scroll-behavior:smooth}
 .section-pad{padding:72px 7.2%}
 .site-header{height:76px;display:flex;align-items:center;justify-content:space-between;padding:0 5.5%;border-bottom:1px solid rgba(242,240,235,.15);position:sticky;top:0;z-index:20;background:rgba(11,11,13,.92);backdrop-filter:blur(14px)}
 .site-logo{display:flex;align-items:center;gap:10px;min-width:150px}
@@ -97,7 +95,7 @@ button{color:inherit}
 .work-card:not(.work-feature) .work-image{aspect-ratio:1.25/1}
 .work-image img{width:100%;height:100%;display:block;object-fit:cover;filter:grayscale(.55) saturate(.65) brightness(.83);transition:transform .6s cubic-bezier(.2,.75,.2,1),filter .35s}
 .work-card:hover .work-image img{transform:scale(1.045);filter:grayscale(.12) saturate(.8) brightness(.92)}
-.image-play{position:absolute;right:15px;bottom:15px;width:38px;height:38px;display:grid;place-items:center;border:1px solid rgba(242,240,235,.6);border-radius:50%;font-size:15px;transition:background .2s;border-color .2s}
+.image-play{position:absolute;right:15px;bottom:15px;width:38px;height:38px;display:grid;place-items:center;border:1px solid rgba(242,240,235,.6);border-radius:50%;font-size:15px;transition:background .2s,border-color .2s}
 .work-card:hover .image-play{background:var(--crimson);border-color:var(--crimson)}
 .work-caption{display:flex;justify-content:space-between;gap:14px;align-items:end;padding:15px 0 7px}
 .work-type{font:8px var(--display);color:var(--crimson);letter-spacing:.13em}
@@ -242,3 +240,48 @@ button{color:inherit}
 .form-whatsapp-link{font:8px/1.8 var(--display);letter-spacing:.08em;color:var(--steel);margin:0}
 .form-whatsapp-link a{color:var(--ivory);border-bottom:1px solid var(--crimson);padding-bottom:2px;margin-left:5px}
 .form-whatsapp-link a:hover{color:#fff}
+
+
+/* QA audit fixes: readable type, contrast, keyboard access and responsive zoom */
+:root{--crimson:#FF667A;--steel:#A5A4AB;--muted:#B9B8BE}
+html{scroll-padding-top:88px}
+[id]{scroll-margin-top:88px}
+body{font-size:14px;line-height:1.6}
+.hero{height:auto;min-height:600px;min-height:min(600px,100dvh)}
+.hero h1{font:700 clamp(49px,7.3vw,96px)/.91 var(--display);letter-spacing:-.085em;margin:0;text-wrap:balance}
+.hero h1 em{font-style:normal;color:var(--crimson)}
+.hero h1 .hero-period{color:var(--crimson)}
+.main-nav a,.header-book,.button{font-size:12px}
+.hero-eyebrow,.section-head,.section-overline,.micro-label,.work-type,.work-number,.work-credit,.booking-bottom,.footer-links a,.footer-copy,.form-whatsapp-link,.form-note{font-size:12px}
+.inquiry-form label{font-size:12px}
+.inquiry-form input,.inquiry-form select,.inquiry-form textarea{font-size:16px;min-height:46px}
+.inquiry-form textarea{min-height:120px}
+.inquiry-form input::placeholder,.inquiry-form textarea::placeholder{color:#A5A4AB;opacity:1}
+.service-no,.service-arrow,.work-caption p{color:var(--crimson)}
+.button-primary,.header-book{background:#A90F2B;color:var(--ivory)}
+.button-primary:hover,.header-book:hover{background:#870D24}
+.work-image{background:linear-gradient(135deg,#25252A,#111114)}
+.hero-photo{background:#18181c}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #FF8796;outline-offset:4px}
+.skip-link{position:fixed;top:10px;left:10px;z-index:1000;padding:12px 16px;background:var(--ivory);color:var(--obsidian);transform:translateY(-160%);font-size:14px}
+.skip-link:focus{transform:translateY(0)}
+.privacy-note{font:12px/1.6 var(--body);color:#C6C4CA;margin:2px 0}
+@media(max-width:900px){.main-nav{gap:clamp(10px,1.3vw,18px)}.main-nav a{font-size:11px}.header-book{font-size:11px;padding:12px}}
+@container site (max-width:700px){
+ .hero{min-height:560px;padding-top:70px;padding-bottom:90px}
+ .hero h1{font-size:clamp(44px,11cqw,70px)}
+ .hero-eyebrow,.section-head,.section-overline,.micro-label,.work-type,.work-number,.work-credit,.booking-bottom,.footer-links a,.footer-copy,.form-whatsapp-link,.form-note{font-size:11px}
+ .main-nav a{font-size:14px}
+ .service-no,.service-detail{font-size:12px}
+ .service-name{font-size:16px}
+ .work-caption p,.work-type,.work-number,.work-credit{font-size:11px}
+ .studio-copy>p,.booking-copy>p{font-size:14px}
+ .booking-bottom{font-size:10px}
+ .inquiry-form input,.inquiry-form select,.inquiry-form textarea{font-size:16px;padding:12px}
+ .footer-links a,.footer-copy,.form-whatsapp-link{font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+.hero{background:linear-gradient(90deg,#0b0b0d 0%,#17171b 58%,#25252a 100%)}
+.studio-image{background:linear-gradient(135deg,#25252a,#111114)}
+.work-image img[hidden],.hero-photo[hidden],.studio-image img[hidden]{display:none}

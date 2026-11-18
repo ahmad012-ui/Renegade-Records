@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://renegadenoir.vercel.app/sitemap.xml
+Sitemap: https://renegade-records-one.vercel.app/sitemap.xml
