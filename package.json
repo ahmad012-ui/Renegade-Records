@@ -2,8 +2,5 @@
   "private": true,
   "engines": {
     "node": ">=20"
-  },
-  "dependencies": {
-    "resend": "^6.0.0"
   }
 }
