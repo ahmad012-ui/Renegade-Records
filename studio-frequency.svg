@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+<title id="title">Find Your Frequency</title>
+<desc id="desc">Abstract crimson sound waves moving through a dark recording-room inspired atmosphere.</desc>
+<defs>
+  <radialGradient id="bg" cx="52%" cy="48%" r="75%"><stop offset="0" stop-color="#302027"/><stop offset=".52" stop-color="#171419"/><stop offset="1" stop-color="#09090b"/></radialGradient>
+  <linearGradient id="wave" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f05a70"/><stop offset=".5" stop-color="#a90f2b"/><stop offset="1" stop-color="#4a0717"/></linearGradient>
+  <filter id="glow"><feGaussianBlur stdDeviation="15" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#fff" stroke-opacity=".055" stroke-width="1"/></pattern>
+</defs>
+<rect width="1200" height="900" fill="url(#bg)"/><rect width="1200" height="900" fill="url(#grid)"/>
+<g opacity=".24" stroke="#d9cbd0" fill="none"><circle cx="600" cy="450" r="330"/><circle cx="600" cy="450" r="260"/><circle cx="600" cy="450" r="190"/></g>
+<g fill="none" stroke="url(#wave)" stroke-linecap="round" filter="url(#glow)">
+<path d="M0 450 C110 450 120 450 170 450 S220 260 270 450 330 650 380 450 440 180 490 450 550 720 600 450 660 180 710 450 770 650 820 450 880 260 930 450 990 650 1040 450 1100 450 1200 450" stroke-width="7"/>
+<path d="M0 450 C120 450 150 450 190 450 S230 330 270 450 330 570 370 450 430 290 470 450 530 610 570 450 630 290 670 450 730 570 770 450 830 330 870 450 930 570 970 450 1030 450 1200 450" stroke-width="3" opacity=".8"/>
+</g>
+<g fill="#f2f0eb" opacity=".75"><circle cx="270" cy="450" r="5"/><circle cx="490" cy="450" r="5"/><circle cx="710" cy="450" r="5"/><circle cx="930" cy="450" r="5"/></g>
+<path d="M70 760H1130" stroke="#a90f2b" stroke-opacity=".65"/>
+<text x="72" y="815" fill="#f2f0eb" opacity=".62" font-family="Arial,sans-serif" font-size="16" letter-spacing="7">RENEGADE RECORDS / SOUND IN MOTION</text>
+<text x="1128" y="815" fill="#a90f2b" text-anchor="end" font-family="Arial,sans-serif" font-size="16" letter-spacing="5">01 — FREQUENCY</text>
+</svg>
