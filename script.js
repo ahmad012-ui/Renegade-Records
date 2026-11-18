@@ -27,6 +27,10 @@ if (mobileToggle && navigation) {
   });
 }
 
+document.querySelectorAll("span").forEach((span) => {
+  if (["↗", "↓", "/"].includes(span.textContent.trim())) span.setAttribute("aria-hidden", "true");
+});
+
 document.querySelectorAll('a[target="_blank"]').forEach((link) => {
   const label = (link.getAttribute("aria-label") || link.textContent || "External link").trim();
   if (!label.toLowerCase().includes("opens in new tab")) {
