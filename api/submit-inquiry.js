@@ -47,7 +47,7 @@ async function sendWhatsAppNotification(inquiry) {
       body: JSON.stringify({
         messaging_product: "whatsapp",
         recipient_type: "individual",
-        to: process.env.WHATSAPP_TO.replace(/\\D/g, ""),
+        to: process.env.WHATSAPP_TO.replace(/[^0-9]/g, ""),
         type: "template",
         template: {
           name: process.env.WHATSAPP_TEMPLATE_NAME,
@@ -156,7 +156,7 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(inquiry.email)) {
+  if (!/^[^@ ]+@[^@ ]+[.][^@ ]+$/.test(inquiry.email)) {
     return json(res, 400, { success: false, message: "Please enter a valid email address." });
   }
 
